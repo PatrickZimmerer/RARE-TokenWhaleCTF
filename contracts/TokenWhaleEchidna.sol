@@ -15,17 +15,9 @@ contract TokenWhaleEchidna is TokenWhaleChallenge {
     TokenWhaleChallenge public token;
     address public player;
 
-    event DebugContractAddress(address);
-    event DebugAllowance(string, uint256);
-    event DebugPlayerAddress(address);
-    event DebugBalanceOfPlayer(uint256);
-
     constructor() public TokenWhaleChallenge(msg.sender) {
         player = msg.sender;
-        // token = new TokenWhaleChallenge[player];
     }
-    115792089237316195423570985008687907853269984665640564039457584007913129639935
-    33142400404106051133704759621939308311405984918913418251171555742580854485416
 
     function echidna_test_balance() public view returns (bool) {
         return !isComplete();
@@ -33,44 +25,8 @@ contract TokenWhaleEchidna is TokenWhaleChallenge {
 
     function testTransfer(address to, uint256 amount) public {
         // Pre conditions
-        require(to == player);
-
         // actions
-        emit DebugContractAddress(address(this));
-        emit DebugPlayerAddress(player);
         // Check that isComplete function returns true or false as expected
         assert(!isComplete());
-        emit DebugBalanceOfPlayer(balanceOf[player]);
-    }
-
-    function testTransferFrom(address from, address to, uint256 amount) public {
-        // Pre conditions
-        require(from == address(this));
-        require(to == player);
-
-        // actions
-        emit DebugContractAddress(address(this));
-        emit DebugPlayerAddress(player);
-        // Check that isComplete function returns true or false as expected
-        assert(!isComplete());
-        emit DebugBalanceOfPlayer(balanceOf[player]);
-    }
-
-    function testApprove(address spender, uint256 value) public {
-        // Pre conditions
-        require(spender == player);
-        require(msg.sender == address(this));
-
-        // actions
-        approve(spender, value);
-        emit DebugContractAddress(address(this));
-        emit DebugAllowance(
-            "allowance contract => player",
-            allowance[(address(this))][player]
-        );
-        emit DebugPlayerAddress(player);
-        // Check that isComplete function returns true or false as expected
-        assert(!isComplete());
-        emit DebugBalanceOfPlayer(balanceOf[player]);
     }
 }
