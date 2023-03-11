@@ -2,13 +2,26 @@
 
 pragma solidity 0.5.0;
 
-// exploit explained:
-// Step 1: send all your tokens to an arbitrary address
-// Step 2: approve the player for an extremely large number (calling from the arbitrary address from above)
-// Step 3: call transferFrom (as the player) and transfer all tokens from the arbitrary address to the contract
-// Step 4 as the player call transfer/transferFrom and send 0 tokens from the smart contract to the player
-// In solidity < 0.8.0 over & underflows as in this example happen silently, this is being abused here, also there is no limit on
-// approving a user for max balanceOf[address] so that makes this exploit possible
+// Steps to produce the exploit explained:
+// Step 1: send 501 of your tokens to address B (just over the half)
+// Step 2: approve the player for a number larger than your balance (calling from address B from above)
+// Step 3: call transferFrom (as the player) and transfer 500 tokens from address B to address B
+
+// Explained how the exploit takes place:
+// TransferFrom checks if the from address has enoguh balance which he has with 501 and checks if the to address balance increases
+// which it does because of the underflow that will happen in _transfer which decreases the balance of the player and causes an underflow
+// in adition the address B will increase his balance as well to 1001
+
+// How to fix it:
+// In solidity < 0.8.0 over & underflows as in this example happen silently, this is being abused here
+// we could use SafeMath from Openzeppelin
+// we should check that you can't transferFrom address B => address B as well
+// also we should make an internal _transferFrom which could change:
+// balanceOf[msg.sender] -= value
+//to =>
+// balanceOf[from] -= value
+
+// since we are only sending tokens from a to b in transferFrom we could also check if totalSupply() changes
 import "./TokenWhale.sol";
 
 contract TokenWhaleEchidna is TokenWhaleChallenge {
