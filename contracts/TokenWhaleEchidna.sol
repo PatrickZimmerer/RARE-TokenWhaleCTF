@@ -2,7 +2,13 @@
 
 pragma solidity 0.5.0;
 
-// Steps to produce the exploit explained:
+// exploit found by echidna explained:
+// Step 1: approve Address B for an extremely large number
+// Step 2: call transferFrom (as Address B) and transfer 1 - 1000 tokens from the player to ther player
+// Step 3 call transfer (as Address B) and transfer any number below MAX_UINT256 - the number you
+//        since you transfered before since Address B has now a huge balance thanks to the underflow
+
+// My way:
 // Step 1: send 501 of your tokens to address B (just over the half)
 // Step 2: approve the player for a number larger than your balance (calling from address B from above)
 // Step 3: call transferFrom (as the player) and transfer 500 tokens from address B to address B
@@ -18,25 +24,22 @@ pragma solidity 0.5.0;
 // we should check that you can't transferFrom address B => address B as well
 // also we should make an internal _transferFrom which could change:
 // balanceOf[msg.sender] -= value
-//to =>
+// to =>
 // balanceOf[from] -= value
-
 // since we are only sending tokens from a to b in transferFrom we could also check if totalSupply() changes
+
 import "./TokenWhale.sol";
 
 contract TokenWhaleEchidna is TokenWhaleChallenge {
     TokenWhaleChallenge public token;
-    address public player;
 
-    constructor() public TokenWhaleChallenge(msg.sender) {
-        player = msg.sender;
-    }
+    constructor() public TokenWhaleChallenge(msg.sender) {}
 
     function echidna_test_balance() public view returns (bool) {
         return !isComplete();
     }
 
-    function testTransfer(address to, uint256 amount) public {
+    function testTransfer(address, uint256) public view {
         // Pre conditions
         // actions
         // Check that isComplete function returns true or false as expected
